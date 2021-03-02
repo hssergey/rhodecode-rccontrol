@@ -1,8 +1,8 @@
 FROM centos:7
-LABEL maintainer="cyrill.kulka@gmail.com"
+LABEL maintainer="sergey@ortoped.org.ru"
 
-ENV RC_INSTALLER    RhodeCode-installer-linux-build20171123_1300
-ENV RC_CHECKSUM     e3b702ebc0e98577ed834781c5a2173f1ece37fab084bb05210fcf6234e011c4
+ENV RC_INSTALLER    RhodeCode-installer-linux-build20210208_0800
+ENV RC_CHECKSUM     a39e6019cd81a4178c5f0f157e1cfafb2bb9e8700fd2b656f6f2e7b5983cda2f
 
 # Create the RhodeCode user
 RUN useradd rhodecode -u 1000 -s /sbin/nologin				\
@@ -16,7 +16,7 @@ USER rhodecode
 WORKDIR /home/rhodecode
 
 # Install RhodeCode Control
-RUN curl -so $RC_INSTALLER https://dls-eu.rhodecode.com/dls/NzA2MjdhN2E2ODYxNzY2NzZjNDA2NTc1NjI3MTcyNzA2MjcxNzIyZTcwNjI3YQ==/rhodecode-control/latest-linux-ce \
+RUN curl -so $RC_INSTALLER https://dls-eu.rhodecode.com/dls/NjY3MjY1NzQ3MjZjNDA2MjY1Njc2MjYzNzI3MTJlNjI2NTc0MmU2NTY4/rhodecode-control/latest-linux-ee \
 		&& echo "$RC_CHECKSUM *$RC_INSTALLER" |  sha256sum -c -	\
 		&& chmod 755 $RC_INSTALLER								\
 		&& ./$RC_INSTALLER --accept-license						\
@@ -24,3 +24,11 @@ RUN curl -so $RC_INSTALLER https://dls-eu.rhodecode.com/dls/NzA2MjdhN2E2ODYxNzY2
 
 # Add additional tools
 COPY files .
+# RUN chmod 755 install.sh
+# RUN chmod 755 start.sh
+
+ENV RC_VERSION 4.24.1
+RUN RC_APP=VCSServer RC_DB=sqlite ./install.sh
+RUN RC_APP=Community RC_DB=sqlite ./install.sh
+
+CMD ["./start.sh"]

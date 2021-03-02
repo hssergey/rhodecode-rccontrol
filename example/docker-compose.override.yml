@@ -1,0 +1,38 @@
+version: '3'
+services:
+            
+  rhodecode:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      RC_APP: Community
+      RC_DB: postgresql://rhodecode:rhodecode@postgres/rhodecode
+      RC_CONFIG: |
+        [DEFAULT]
+        app_email_from = mail@example.com
+        error_email_from = mail@example.com
+        email_to = mail@example.com
+        smtp_server = example.com
+        smtp_username = myuser
+        smtp_password = secret
+        smtp_port = 587
+        smtp_use_tls = true
+        
+        [app:main]
+        vcs.server.enable = true
+        vcs.server = vcsserver:5000
+        beaker.session.secret = secret
+    volumes:
+      - ../repos:/home/repos/repos
+    depends_on:
+      - postgres
+      - vcsserver
+    ports:
+      - "127.0.0.1:5000:5000"
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "50m"
+      
